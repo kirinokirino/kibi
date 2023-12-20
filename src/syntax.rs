@@ -2,7 +2,7 @@ use std::fmt::{self, Display, Formatter};
 use std::path::{Path, PathBuf};
 
 use crate::config::{self, parse_value as pv, parse_values as pvs};
-use crate::{sys, Error};
+use crate::{data_dirs, Error};
 
 /// Type of syntax highlighting for a single rendered character.
 ///
@@ -53,7 +53,7 @@ impl Conf {
     /// Return the syntax configuration corresponding to the given file extension, if a matching
     /// INI file is found in a config directory.
     pub fn get(ext: &str) -> Result<Option<Self>, Error> {
-        for conf_dir in sys::data_dirs() {
+        for conf_dir in data_dirs() {
             match PathBuf::from(conf_dir).join("syntax.d").read_dir() {
                 Ok(dir_entries) => {
                     for dir_entry in dir_entries {

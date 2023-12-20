@@ -4,32 +4,11 @@
 
 pub use crate::{config::Config, editor::Editor, error::Error};
 
-use term::ansi_escape;
 mod config;
 mod editor;
 mod error;
 mod row;
 mod syntax;
-mod terminal;
-
-#[cfg(windows)]
-mod windows;
-#[cfg(windows)]
-use windows as sys;
-
-#[cfg(unix)]
-mod unix;
-#[cfg(unix)]
-mod xdg;
-#[cfg(unix)]
-use unix as sys;
-
-#[cfg(target_os = "wasi")]
-mod wasi;
-#[cfg(target_os = "wasi")]
-mod xdg;
-#[cfg(target_os = "wasi")]
-use wasi as sys;
 
 /// Load the configuration, initialize the editor and run the program, optionally opening a file if
 /// an argument is given.
@@ -47,3 +26,25 @@ fn main() -> Result<(), Error> {
     }
     Ok(())
 }
+
+#[cfg(windows)]
+/// Return configuration directories for Windows systems
+pub fn conf_dirs() -> Vec<String> {
+	var("APPDATA").map(|d| d + "/Kibi").into_iter().collect()
+}
+
+/// Return data directories for Windows systems
+#[cfg(windows)]
+pub fn data_dirs() -> Vec<String> {
+	conf_dirs()
+}
+
+#[cfg(unix)]
+mod xdg;
+#[cfg(unix)]
+use xdg::{conf_dirs, data_dirs};
+
+#[cfg(target_os = "wasi")]
+mod xdg;
+#[cfg(target_os = "wasi")]
+use xdg::{conf_dirs, data_dirs};

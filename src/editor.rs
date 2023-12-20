@@ -1,12 +1,14 @@
 #![allow(clippy::wildcard_imports)]
 
+use term::{ansi_escape::*, sys, terminal};
+
 use std::fmt::{Display, Write as _};
 use std::io::{self, BufRead, BufReader, ErrorKind, Read, Seek, Write};
 use std::iter::{self, repeat, successors};
 use std::{fs::File, path::Path, process::Command, thread, time::Instant};
 
 use crate::row::{HlState, Row};
-use crate::{ansi_escape::*, syntax::Conf as SyntaxConf, sys, terminal, Config, Error};
+use crate::{syntax::Conf as SyntaxConf, Config, Error};
 
 const fn ctrl_key(key: u8) -> u8 {
     key & 0x1f

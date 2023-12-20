@@ -3,11 +3,11 @@
 //! Utilities for rows. A `Row` owns the underlying characters, the rendered string and the syntax
 //! highlighting information.
 
+use unicode_width::UnicodeWidthChar;
+use term::ansi_escape::{RESET_FMT, REVERSE_VIDEO};
+
 use std::{fmt::Write, iter::repeat};
 
-use unicode_width::UnicodeWidthChar;
-
-use crate::ansi_escape::{RESET_FMT, REVERSE_VIDEO};
 use crate::error::Error;
 use crate::syntax::{Conf as SyntaxConf, HlType};
 

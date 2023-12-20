@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::{fmt::Display, fs::File, str::FromStr, time::Duration};
 
-use crate::{sys::conf_dirs as cdirs, Error, Error::Config as ConfErr};
+use crate::{conf_dirs as cdirs, Error, Error::Config as ConfErr};
 
 /// The global Kibi configuration.
 #[derive(Debug, PartialEq, Eq)]

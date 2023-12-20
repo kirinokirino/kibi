@@ -19,6 +19,9 @@ pub enum Error {
     TooManyArguments(usize),
     /// Unrecognized option given as a command line argument.
     UnrecognizedOption(String),
+
+    /// Wrapper around `term::error::Error`
+    Term(term::error::Error),
 }
 
 impl From<std::io::Error> for Error {
@@ -33,4 +36,11 @@ impl From<std::fmt::Error> for Error {
     fn from(err: std::fmt::Error) -> Self {
         Self::Fmt(err)
     }
+}
+
+impl From<term::error::Error> for Error {
+	/// Convert a term Error into a Kibi Error.
+	fn from(err: term::error::Error) -> Self {
+		Self::Term(err)
+	}
 }
