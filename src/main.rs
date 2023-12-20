@@ -4,7 +4,7 @@
 
 pub use crate::{config::Config, editor::Editor, error::Error};
 
-pub mod ansi_escape;
+use term::ansi_escape;
 mod config;
 mod editor;
 mod error;
