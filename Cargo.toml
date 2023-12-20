@@ -12,6 +12,14 @@ keywords = ["editor", "terminal", "text-editor"]
 categories = ["text-editors", "development-tools"]
 include = ["src/**/*", "Cargo.toml", "LICENSE*", "COPYRIGHT"]
 
+[lib]
+name = "term"
+path = "src/term/lib.rs"
+
+[[bin]]
+name = "kibi"
+path = "src/main.rs"
+
 [dependencies]
 unicode-width = "0.1.11"
 
