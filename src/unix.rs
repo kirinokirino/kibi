@@ -29,14 +29,18 @@ pub fn get_window_size() -> Result<(usize, usize), Error> {
     cerr(unsafe { libc::ioctl(STDOUT_FILENO, TIOCGWINSZ, maybe_ws.as_mut_ptr()) })
         .map_or(None, |()| unsafe { Some(maybe_ws.assume_init()) })
         .filter(|ws| ws.ws_col != 0 && ws.ws_row != 0)
-        .map_or(Err(Error::InvalidWindowSize), |ws| Ok((ws.ws_row as usize, ws.ws_col as usize)))
+        .map_or(Err(Error::InvalidWindowSize), |ws| {
+            Ok((ws.ws_row as usize, ws.ws_col as usize))
+        })
 }
 
 /// Stores whether the window size has changed since last call to `has_window_size_changed`.
 static WSC: AtomicBool = AtomicBool::new(false);
 
 /// Handle a change in window size.
-extern "C" fn handle_wsize(_: c_int, _: *mut siginfo_t, _: *mut c_void) { WSC.store(true, Relaxed) }
+extern "C" fn handle_wsize(_: c_int, _: *mut siginfo_t, _: *mut c_void) {
+    WSC.store(true, Relaxed)
+}
 
 /// Register a signal handler that sets a global variable when the window size changes.
 /// After calling this function, use `has_window_size_changed` to query the global variable.
@@ -48,13 +52,19 @@ pub fn register_winsize_change_signal_handler() -> Result<(), Error> {
         // sa_handler field, so we use sa_sigaction instead.
         (*maybe_sa.as_mut_ptr()).sa_flags = SA_SIGINFO;
         (*maybe_sa.as_mut_ptr()).sa_sigaction = handle_wsize as sighandler_t;
-        cerr(libc::sigaction(libc::SIGWINCH, maybe_sa.as_ptr(), std::ptr::null_mut()))
+        cerr(libc::sigaction(
+            libc::SIGWINCH,
+            maybe_sa.as_ptr(),
+            std::ptr::null_mut(),
+        ))
     }
 }
 
 /// Check if the windows size has changed since the last call to this function.
 /// The `register_winsize_change_signal_handler` needs to be called before this function.
-pub fn has_window_size_changed() -> bool { WSC.swap(false, Relaxed) }
+pub fn has_window_size_changed() -> bool {
+    WSC.swap(false, Relaxed)
+}
 
 /// Set the terminal mode.
 pub fn set_term_mode(term: &TermMode) -> Result<(), Error> {
@@ -78,6 +88,10 @@ pub fn enable_raw_mode() -> Result<TermMode, Error> {
 }
 
 #[allow(clippy::unnecessary_wraps)] // Result required on other platforms
-pub fn stdin() -> std::io::Result<std::io::Stdin> { Ok(std::io::stdin()) }
+pub fn stdin() -> std::io::Result<std::io::Stdin> {
+    Ok(std::io::stdin())
+}
 
-pub fn path(filename: &str) -> std::path::PathBuf { std::path::PathBuf::from(filename) }
+pub fn path(filename: &str) -> std::path::PathBuf {
+    std::path::PathBuf::from(filename)
+}
