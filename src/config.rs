@@ -114,6 +114,7 @@ pub fn parse_values<T: FromStr<Err = E>, E: Display>(value: &str) -> Result<Vec<
 }
 
 #[cfg(test)]
+#[cfg(not(target_family = "wasm"))] // No filesystem on wasm
 mod tests {
     use std::ffi::{OsStr, OsString};
     use std::{env, fs};
