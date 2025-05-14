@@ -4,7 +4,7 @@
 
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
-use std::{fmt::Display, fs::File, str::FromStr, time::Duration};
+use std::{fmt::Display, fs::File, str::FromStr};
 
 use crate::{conf_dirs as cdirs, Error, Error::Config as ConfErr};
 
@@ -17,8 +17,6 @@ pub struct Config {
     /// file was last changed.
     pub quit_times: usize,
     /// The duration for which messages are shown in the status bar.
-    pub message_dur: Duration,
-    /// Whether to display line numbers.
     pub show_line_num: bool,
 }
 
@@ -28,7 +26,6 @@ impl Default for Config {
         Self {
             tab_stop: 4,
             quit_times: 2,
-            message_dur: Duration::new(3, 0),
             show_line_num: true,
         }
     }
@@ -63,9 +60,6 @@ impl Config {
                         tab_stop => conf.tab_stop = tab_stop,
                     },
                     "quit_times" => conf.quit_times = parse_value(value)?,
-                    "message_duration" => {
-                        conf.message_dur = Duration::from_secs_f32(parse_value(value)?)
-                    }
                     "show_line_numbers" => conf.show_line_num = parse_value(value)?,
                     _ => return Err(format!("Invalid key: {key}")),
                 };

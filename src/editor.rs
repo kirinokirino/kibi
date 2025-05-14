@@ -5,7 +5,7 @@ use term::{ansi_escape::*, sys, terminal};
 use std::fmt::{Display, Write as _};
 use std::io::{self, BufRead, BufReader, ErrorKind, Read, Seek, Write};
 use std::iter::{self, repeat, successors};
-use std::{fs::File, path::Path, process::Command, thread, time::Instant};
+use std::{fs::File, path::Path, process::Command, thread};
 
 use crate::row::{HlState, Row};
 use crate::{syntax::Conf as SyntaxConf, Config, Error};
@@ -138,8 +138,6 @@ pub struct Editor {
 struct StatusMessage {
     /// The message to display.
     msg: String,
-    /// The `Instant` the status message was first displayed.
-    time: Instant,
 }
 
 impl StatusMessage {
@@ -147,7 +145,6 @@ impl StatusMessage {
     fn new(msg: String) -> Self {
         Self {
             msg,
-            time: Instant::now(),
         }
     }
 }
@@ -639,11 +636,9 @@ impl Editor {
     /// Draw the message bar on the terminal, by adding characters to the buffer.
     fn draw_message_bar(&self, buffer: &mut String) {
         buffer.push_str(CLEAR_LINE_RIGHT_OF_CURSOR);
-        let msg_duration = self.config.message_dur;
         if let Some(sm) = self
             .status_msg
             .as_ref()
-            .filter(|sm| sm.time.elapsed() < msg_duration)
         {
             buffer.push_str(&sm.msg[..sm.msg.len().min(self.window_width)]);
         }
@@ -778,7 +773,7 @@ impl Editor {
         }
         loop {
             if let Some(mode) = self.prompt_mode.as_ref() {
-                set_status!(self, "{}", mode.status_msg());
+                set_status!(self, "Mode: {}", mode.status_msg());
             }
             self.refresh_screen()?;
             let key = self.loop_until_keypress()?;
@@ -835,7 +830,7 @@ impl PromptMode {
 
     /// Process a keypress event for the selected `PromptMode`.
     fn process_keypress(self, ed: &mut Editor, key: &Key) -> Result<Option<Self>, Error> {
-        ed.status_msg = None;
+        set_status!(ed, "{}", HELP_MESSAGE);
         match self {
             Self::Save(b) => match process_prompt_keypress(b, key) {
                 PromptState::Active(b) => return Ok(Some(Self::Save(b))),
